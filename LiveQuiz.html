@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FMGE Mixed Live Test</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{background:#0f172a;color:white;font-family:system-ui;}
+.correct{background:#16a34a!important;}
+.wrong{background:#dc2626!important;}
+</style>
+</head>
+
+<body class="flex justify-center items-center min-h-screen">
+
+<div class="w-full max-w-xl p-5">
+
+<!-- START -->
+<div id="start" class="text-center">
+<h1 class="text-3xl font-bold mb-6">🧠 START REVISION</h1>
+<button onclick="startQuiz()" class="bg-blue-500 px-8 py-4 rounded-xl text-xl font-semibold">Start Test</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="hidden">
+
+<div class="flex justify-between mb-3 text-lg">
+<div>✅ <span id="c">0</span></div>
+<div>❌ <span id="w">0</span></div>
+<div>⏳ <span id="t">60</span>s</div>
+</div>
+
+<div id="dots" class="flex gap-1 mb-4"></div>
+
+<h2 id="q" class="text-xl font-semibold mb-4"></h2>
+
+<img id="qimg" class="mb-4 rounded-xl hidden"/>
+
+<div id="opts" class="space-y-3"></div>
+
+<div id="exp" class="mt-5 text-sm text-gray-300 hidden"></div>
+
+<button id="next" onclick="nextQ()" class="mt-5 bg-blue-500 px-6 py-3 rounded-lg hidden">Next</button>
+
+</div>
+
+<!-- BREAK -->
+<div id="break" class="hidden text-center">
+<h2 class="text-2xl mb-4">Take a Quick Break 📲</h2>
+<p class="mb-5">Join for daily PYQs & flashcards</p>
+<a href="https://whatsapp.com/channel/0029VanTshI0LKZAZreeWS46"
+class="bg-green-500 px-6 py-3 rounded-lg">Join Channel</a>
+<br><br>
+<button onclick="resume()" class="underline text-blue-400">Skip</button>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="hidden text-center">
+<h2 class="text-3xl font-bold mb-4">Your Score</h2>
+<p id="score" class="text-2xl mb-6"></p>
+
+<div class="bg-slate-800 p-4 rounded-xl mb-4">
+<p>This quiz was made by <b>Cerebellum Code - MAGICBTR</b></p>
+<p>Use Prepladder Code: <b>HARSJZ4E</b></p>
+</div>
+
+<a href="https://whatsapp.com/channel/0029VanTshI0LKZAZreeWS46"
+class="bg-green-500 px-6 py-3 rounded-lg">JOIN WHATSAPP CHANNEL</a>
+</div>
+
+</div>
+
+<script>
+
+// -------- QUESTIONS --------
+
+const Q = [
+
+{
+q:"Broca’s area lies in:",
+o:["Inferior frontal gyrus","Angular gyrus","Postcentral gyrus","Superior temporal gyrus"],
+a:0,
+e:"Broca area (44,45) controls motor speech → inferior frontal gyrus."
+},
+
+{
+q:"Most common cause of community acquired pneumonia:",
+o:["Strep pneumoniae","Klebsiella","Mycoplasma","Staph aureus"],
+a:0,
+e:"Streptococcus pneumoniae is #1 CAP organism — very repeated question."
+},
+
+{
+q:"Drug causing red man syndrome:",
+o:["Vancomycin","Linezolid","Rifampicin","Amikacin"],
+a:0,
+e:"Vancomycin rapid infusion → histamine release → flushing + hypotension."
+},
+
+{
+q:"Which vitamin deficiency causes night blindness?",
+o:["Vitamin A","Vitamin D","Vitamin C","Vitamin K"],
+a:0,
+e:"Vitamin A deficiency → rod dysfunction → night blindness."
+},
+
+{
+q:"Target organ damaged in rheumatic fever:",
+o:["Heart valves","Kidney","Liver","Pancreas"],
+a:0,
+e:"Autoimmune reaction after Strep → pancarditis → mitral valve most affected."
+},
+
+{
+q:"Reed-Sternberg cell is seen in:",
+o:["Hodgkin lymphoma","NHL","ALL","AML"],
+a:0,
+e:"Owl eye cells → Hodgkin lymphoma hallmark."
+},
+
+{
+q:"Most sensitive marker of MI:",
+o:["Troponin I","CK-MB","LDH","Myoglobin"],
+a:0,
+e:"Troponin I is most specific and sensitive marker."
+},
+
+{
+q:"Which bacteria produces urease?",
+o:["H. pylori","E. coli","Salmonella","Shigella"],
+a:0,
+e:"Urease → ammonia production → gastric mucosal injury."
+},
+
+{
+q:"First line drug in anaphylaxis:",
+o:["IM Adrenaline","Hydrocortisone","Antihistamine","Salbutamol"],
+a:0,
+e:"Always IM adrenaline in thigh — life saving."
+},
+
+{
+q:"X-ray shows bat-wing pattern — diagnosis?",
+img:"https://upload.wikimedia.org/wikipedia/commons/6/6d/Pulmonary_edema.JPG",
+o:["Pulmonary edema","TB","Pneumothorax","COPD"],
+a:0,
+e:"Perihilar bat-wing opacity → pulmonary edema (LV failure)."
+},
+
+// After 10 break screen triggers
+
+{
+q:"Histology shows granuloma with caseation:",
+img:"https://upload.wikimedia.org/wikipedia/commons/2/21/Tuberculosis_granuloma.jpg",
+o:["Tuberculosis","Sarcoidosis","Syphilis","Leprosy"],
+a:0,
+e:"Caseating granuloma = TB until proven otherwise."
+},
+
+{
+q:"Most common cause of nephrotic syndrome in children:",
+o:["Minimal change disease","FSGS","Membranous","IgA nephropathy"],
+a:0,
+e:"Podocyte effacement → steroid responsive."
+}
+
+];
+
+let i=0,c=0,w=0,time=60,timer;
+
+function startQuiz(){
+document.getElementById("start").classList.add("hidden");
+document.getElementById("quiz").classList.remove("hidden");
+dots();
+load();
+}
+
+function dots(){
+let d=document.getElementById("dots");
+for(let j=0;j<Q.length;j++){
+let x=document.createElement("div");
+x.className="w-3 h-3 bg-gray-600 rounded-full";
+d.appendChild(x);
+}
+}
+
+function load(){
+resetTimer();
+let q=Q[i];
+document.getElementById("q").innerText=q.q;
+
+let img=document.getElementById("qimg");
+if(q.img){img.src=q.img;img.classList.remove("hidden");}
+else img.classList.add("hidden");
+
+let opt=document.getElementById("opts");
+opt.innerHTML="";
+q.o.forEach((t,ind)=>{
+let b=document.createElement("button");
+b.className="w-full bg-slate-700 p-3 rounded-lg";
+b.innerText=t;
+b.onclick=()=>check(b,ind);
+opt.appendChild(b);
+});
+}
+
+function check(btn,ind){
+clearInterval(timer);
+let q=Q[i];
+if(ind===q.a){btn.classList.add("correct");c++;document.getElementById("c").innerText=c;}
+else{btn.classList.add("wrong");w++;document.getElementById("w").innerText=w;}
+
+document.getElementById("exp").innerText=q.e;
+document.getElementById("exp").classList.remove("hidden");
+document.getElementById("next").classList.remove("hidden");
+}
+
+function nextQ(){
+i++;
+document.getElementById("exp").classList.add("hidden");
+document.getElementById("next").classList.add("hidden");
+
+if(i===10){
+document.getElementById("quiz").classList.add("hidden");
+document.getElementById("break").classList.remove("hidden");
+return;
+}
+
+if(i>=Q.length){
+finish();
+return;
+}
+load();
+}
+
+function resume(){
+document.getElementById("break").classList.add("hidden");
+document.getElementById("quiz").classList.remove("hidden");
+load();
+}
+
+function resetTimer(){
+time=60;
+document.getElementById("t").innerText=time;
+clearInterval(timer);
+timer=setInterval(()=>{
+time--;
+document.getElementById("t").innerText=time;
+if(time<=0){w++;document.getElementById("w").innerText=w;nextQ();}
+},1000);
+}
+
+function finish(){
+document.getElementById("quiz").classList.add("hidden");
+document.getElementById("result").classList.remove("hidden");
+document.getElementById("score").innerText=c+" / "+Q.length;
+}
+
+</script>
+</body>
+</html>
