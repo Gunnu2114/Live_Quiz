@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical High-Yield Revision Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 4px; transition: all 0.3s; }
+        .dot-pending { background-color: #cbd5e1; }
+        .dot-current { background-color: #3b82f6; transform: scale(1.2); }
+        .dot-correct { background-color: #10b981; }
+        .dot-incorrect { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="splash" class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center border-t-8 border-blue-600">
+        <h1 class="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tight">Anatomy & Embryology</h1>
+        <p class="text-slate-500 mb-8 font-medium italic">High-Yield Revision: Pages 126 - 138</p>
+        <button onclick="startQuiz()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl transition transform active:scale-95 shadow-lg text-xl tracking-widest">
+            START REVISION
+        </button>
+    </div>
+
+    <div id="quiz-container" class="hidden max-w-lg w-full">
+        <div class="flex justify-between items-center mb-6 px-2">
+            <div class="flex space-x-4">
+                <span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-full border border-green-200">✅ <span id="score-correct">0</span></span>
+                <span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full border border-red-200">❌ <span id="score-incorrect">0</span></span>
+            </div>
+            <div id="timer-display" class="bg-blue-600 text-white font-black px-4 py-2 rounded-xl shadow-md border-2 border-white">
+                60s
+            </div>
+        </div>
+
+        <div id="progress-bar" class="flex justify-center mb-6"></div>
+
+        <div class="bg-white rounded-3xl shadow-xl p-6 border border-slate-100 min-h-[400px] flex flex-col">
+            <p id="question-text" class="text-xl font-bold text-slate-800 mb-8 leading-relaxed"></p>
+            
+            <div id="options-list" class="space-y-3 flex-grow"></div>
+
+            <div id="feedback-area" class="hidden mt-6 p-5 rounded-2xl animate-pulse border-2">
+                <p id="explanation" class="text-sm font-medium"></p>
+            </div>
+        </div>
+
+        <button id="next-btn" onclick="nextQuestion()" class="hidden w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl transition active:scale-95 text-lg">
+            NEXT QUESTION →
+        </button>
+    </div>
+
+    <div id="break-screen" class="hidden max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center border-t-8 border-green-500">
+        <div class="flex justify-center mb-4 text-green-500">
+            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <h2 class="text-2xl font-black text-slate-800 mb-2">Mid-Revision Break</h2>
+        <p class="text-slate-600 mb-6">You've reached Question 10! Join our community for high-yield notes and updates.</p>
+        <a href="https://whatsapp.com/channel/0029VanTshI0LKZAZreeWS46" target="_blank" class="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl mb-4 shadow-lg transition transform active:scale-95">
+            JOIN CHANNEL
+        </a>
+        <button onclick="resumeQuiz()" class="text-slate-400 font-bold hover:text-blue-500 transition border-b-2 border-transparent hover:border-blue-500">
+            SKIP AND CONTINUE →
+        </button>
+    </div>
+
+    <div id="results" class="hidden max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center">
+        <h2 class="text-3xl font-black text-slate-800 mb-2">Revision Complete!</h2>
+        <div class="text-6xl font-black text-blue-600 my-6" id="final-score-text">0/14</div>
+        <p class="text-slate-500 font-medium mb-8">Great job on your high-yield anatomy session.</p>
+        
+        <div class="space-y-4 mb-8">
+            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                <p class="text-blue-800 font-bold text-xs uppercase tracking-widest mb-1">Cerebellum Code</p>
+                <p class="text-blue-600 font-black text-lg">MAGICBTR</p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <p class="text-slate-800 font-bold text-xs uppercase tracking-widest mb-1">Prepladder Code</p>
+                <p class="text-blue-600 font-black text-lg">HARSJZ4E</p>
+            </div>
+        </div>
+
+        <a href="https://whatsapp.com/channel/0029VanTshI0LKZAZreeWS46" target="_blank" class="flex items-center justify-center space-x-3 w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-green-600 transition mb-6">
+            <span>JOIN WHATSAPP CHANNEL</span>
+        </a>
+        
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Made by Cerebellum Code - MAGICBTR</p>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Identify the thickened nerve marked with the arrow in the patient image (commonly seen in Leprosy):", a: ["Great auricular nerve", "Lesser occipital nerve", "Facial nerve", "Auriculotemporal nerve"], c: 0, e: "The great auricular nerve is the largest ascending branch of the cervical plexus (C2, C3). In leprosy, it is often palpable over the sternocleidomastoid muscle." },
+            { q: "Where is Broca's area situated?", a: ["Inferior frontal gyrus", "Superior temporal gyrus", "Angular gyrus", "Postcentral gyrus"], c: 0, e: "Broca's motor speech area (Brodmann areas 44, 45) is located in the inferior frontal gyrus. Wernicke's area (22) is in the superior temporal gyrus." },
+            { q: "Which cranial nerve nucleus is NOT part of the special visceral afferent (SVA) column?", a: ["Facial nerve", "Trochlear nerve", "Vagus nerve", "Glossopharyngeal nerve"], c: 1, e: "The trochlear nerve (IV) is GSE (General Somatic Efferent). The SVA column includes VII, IX, and X for taste." },
+            { q: "The joint between the attachment of the 8th and 9th rib to the 7th rib is a:", a: ["Fibrocartilaginous joint", "Symphyseal joint", "Synovial joint", "Fibrous joint"], c: 2, e: "The interchondral joints between the costal cartilages of ribs 7-10 are synovial joints." },
+            { q: "Which is the last fontanelle to close?", a: ["Anterior", "Posterior", "Occipital", "Mastoid"], c: 0, e: "The anterior fontanelle closes last, typically at around 18-24 months of age." },
+            { q: "Which statement regarding Sibson's fascia is INCORRECT?", a: ["Attached to the inner border of 2nd rib", "Covers apical part of lung", "Part of scalenus minimus muscle", "Vessels pass above the fascia"], c: 0, e: "Sibson's fascia (suprapleural membrane) is attached to the inner border of the 1st rib and the transverse process of the C7 vertebra." },
+            { q: "Which structure does NOT pass through the aortic opening of the diaphragm?", a: ["Aorta", "Azygous vein", "Thoracic duct", "Vagal trunk"], c: 3, e: "Vagal trunks pass through the esophageal opening at T10. The aortic opening at T12 transmits the aorta, azygous vein, and thoracic duct." },
+            { q: "The hard palate contains which of the following?", a: ["Keratinised epithelium, submucosa, minor salivary glands", "Keratinised epithelium, absent submucosa", "Non-keratinised epithelium", "Non-keratinised, minor salivary glands"], c: 0, e: "The hard palate features keratinized stratified squamous epithelium and a submucosa containing minor mucous-type salivary glands." },
+            { q: "What is the function of the lumbricals at the metacarpophalangeal (MCP) joints?", a: ["Flexion", "Extension", "Adduction", "Abduction"], c: 0, e: "Lumbricals are intrinsic hand muscles that flex the MCP joints and extend the interphalangeal (IP) joints." },
+            { q: "Which of the following is a tensor of the vocal cords?", a: ["Cricothyroid", "Lateral cricoarytenoid", "Thyroarytenoids", "Posterior cricoarytenoids"], c: 0, e: "The cricothyroid is the only tensor of the vocal cords." },
+            { q: "The nerve of the second branchial (pharyngeal) arch is the:", a: ["Glossopharyngeal", "Trigeminal", "Facial", "Vagus"], c: 2, e: "The facial nerve (VII) is the nerve of the 2nd arch. The trigeminal (V) is for the 1st arch." },
+            { q: "Which is true regarding the iliopubic tract?", a: ["Thickening of lumbar fascia", "Lies anterior to Poupart's ligament", "Inserts into pubic tubercle in front of conjoint tendon", "Its fibers fan out with fascia iliaca laterally"], c: 3, e: "The iliopubic tract is a thickening of transversalis fascia. Laterally, its fibers fan out within the fascia transversalis and fascia iliaca." },
+            { q: "The ureteric bud develops from the:", a: ["Mesonephric duct", "Metanephros", "Pronephros", "Genital sinus"], c: 0, e: "The ureteric bud arises from the mesonephric duct and forms the collecting system of the kidney." },
+            { q: "In which week of development does the heart start to beat?", a: ["2nd week", "4th week", "6th week", "10th week"], c: 1, e: "The heart begins to beat during the 4th week of embryonic development." }
+        ];
+
+        let currentIdx = 0;
+        let scoreCorrect = 0;
+        let scoreIncorrect = 0;
+        let timeLeft = 60;
+        let timer;
+
+        function startQuiz() {
+            document.getElementById('splash').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            renderProgressDots();
+            loadQuestion();
+        }
+
+        function renderProgressDots() {
+            const container = document.getElementById('progress-bar');
+            container.innerHTML = '';
+            questions.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot dot-pending';
+                dot.id = `dot-${i}`;
+                container.appendChild(dot);
+            });
+        }
+
+        function startTimer() {
+            timeLeft = 60;
+            updateTimerDisplay();
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleAnswer(-1); // Auto-fail on timeout
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timer-display');
+            display.innerText = `${timeLeft}s`;
+            if (timeLeft < 10) display.classList.add('bg-red-500');
+            else display.classList.remove('bg-red-500');
+        }
+
+        function loadQuestion() {
+            const question = questions[currentIdx];
+            document.getElementById('question-text').innerText = question.q;
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('feedback-area').classList.add('hidden');
+            
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+            
+            question.a.forEach((option, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-400 font-bold text-slate-700 transition active:scale-95";
+                btn.innerText = option;
+                btn.onclick = () => handleAnswer(i);
+                optionsList.appendChild(btn);
+            });
+
+            document.getElementById(`dot-${currentIdx}`).className = 'dot dot-current';
+            startTimer();
+        }
+
+        function handleAnswer(selectedIdx) {
+            clearInterval(timer);
+            const question = questions[currentIdx];
+            const buttons = document.getElementById('options-list').children;
+            const feedbackArea = document.getElementById('feedback-area');
+            const explanation = document.getElementById('explanation');
+            const dot = document.getElementById(`dot-${currentIdx}`);
+
+            for (let btn of buttons) btn.disabled = true;
+
+            if (selectedIdx === question.c) {
+                buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-800 font-bold";
+                feedbackArea.className = "mt-6 p-5 rounded-2xl border-2 border-green-200 bg-green-50 block";
+                explanation.innerText = "CORRECT! " + question.e;
+                scoreCorrect++;
+                dot.className = 'dot dot-correct';
+            } else {
+                if (selectedIdx !== -1) buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-800 font-bold";
+                buttons[question.c].className = "w-full text-left p-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-800 font-bold";
+                feedbackArea.className = "mt-6 p-5 rounded-2xl border-2 border-red-200 bg-red-50 block";
+                explanation.innerText = "INCORRECT. " + question.e;
+                scoreIncorrect++;
+                dot.className = 'dot dot-incorrect';
+            }
+
+            document.getElementById('score-correct').innerText = scoreCorrect;
+            document.getElementById('score-incorrect').innerText = scoreIncorrect;
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx === 10) {
+                showBreak();
+            } else if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showBreak() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('break-screen').classList.remove('hidden');
+        }
+
+        function resumeQuiz() {
+            document.getElementById('break-screen').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function showFinalResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('final-score-text').innerText = `${scoreCorrect} / ${questions.length}`;
+        }
+    </script>
+</body>
+</html>
